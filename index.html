@@ -10,13 +10,13 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            -webkit-tap-highlight-color: transparent; /* Remove o quadrado azul ao tocar no celular */
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: #f4f7f6;
             color: #333;
-            padding: 10px; /* Reduzido para dar mais espaço nas laterais do celular */
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -27,7 +27,7 @@
             width: 100%;
             max-width: 500px;
             background: white;
-            padding: 15px; /* Reduzido para telas menores */
+            padding: 15px;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             display: flex;
@@ -48,7 +48,6 @@
             margin-bottom: 15px;
         }
 
-        /* --- DASHBOARD ADAPTÁVEL --- */
         .dashboard {
             display: flex;
             gap: 8px;
@@ -89,7 +88,7 @@
         input[type="number"] {
             flex: 1;
             padding: 12px;
-            font-size: 16px; /* 16px impede que o iOS (iPhone) dê zoom automático ao focar */
+            font-size: 16px;
             border: 2px solid #bdc3c7;
             border-radius: 8px;
             outline: none;
@@ -123,7 +122,6 @@
             background-color: #27ae60;
         }
 
-        /* --- ABAS AJUSTADAS PARA CELULAR --- */
         .tabs {
             display: flex;
             gap: 4px;
@@ -136,7 +134,7 @@
         .tab-btn {
             flex: 1;
             padding: 10px 2px;
-            font-size: 12px; /* Fonte ligeiramente menor para não quebrar linha em telas pequenas */
+            font-size: 12px;
             background-color: #e0e0e0;
             color: #555;
             border: none;
@@ -152,10 +150,9 @@
             color: white;
         }
 
-        /* --- ALTURA DINÂMICA DA TABELA --- */
         .historico-section {
             margin-top: 5px;
-            max-height: 50vh; /* Ocupa no máximo 50% da altura da tela do celular */
+            max-height: 40vh;
             overflow-y: auto;
             border: 1px solid #ecf0f1;
             border-radius: 8px;
@@ -226,7 +223,7 @@
 
     <div class="container">
         <h1>Contador de Hinos</h1>
-        <div id="statusConexao" class="status-conexao">Carregando dados da nuvem...</div>
+        <div id="statusConexao" class="status-conexao">Carregando dados...</div>
         
         <div class="dashboard">
             <div class="dash-card">
@@ -263,7 +260,7 @@
                     </tr>
                 </thead>
                 <tbody id="tabelaHinos">
-                    <tr><td colspan="2" style="text-align:center; color:#95a5a6;">Buscando registros...</td></tr>
+                    <tr><td colspan="2" style="text-align:center; color:#95a5a6;">Nenhum hino registrado ainda.</td></tr>
                 </tbody>
             </table>
         </div>
@@ -288,14 +285,19 @@
                 const response = await fetch(FIREBASE_URL);
                 const dados = await response.json();
                 
-                controleHinos = dados ? dados : {};
+                // Validação crucial: se a resposta conter erro ou "rules", ignora os dados
+                if (dados && (dados.error || dados.rules || typeof dados === 'string')) {
+                    throw new Error("Erro de permissão ou formato inválido retornado pelo Firebase.");
+                }
+                
+                controleHinos = (dados && typeof dados === 'object') ? dados : {};
                 
                 statusDiv.innerText = "Sincronizado com a Nuvem";
                 statusDiv.style.color = "#2ecc71";
                 atualizarTabela();
             } catch (error) {
                 console.error("Erro ao buscar dados:", error);
-                statusDiv.innerText = "Erro ao conectar. Usando dados locais offline.";
+                statusDiv.innerText = "Aviso: Verifique as Regras do Firebase.";
                 statusDiv.style.color = "#e74c3c";
                 
                 controleHinos = JSON.parse(localStorage.getItem('controleHinos_backup')) || {};
@@ -338,7 +340,7 @@
                 document.getElementById('statusConexao').style.color = "#2ecc71";
             } catch (error) {
                 console.error("Erro ao salvar dados:", error);
-                document.getElementById('statusConexao').innerText = "Erro ao salvar na nuvem (Salvo localmente)";
+                document.getElementById('statusConexao').innerText = "Erro ao salvar na nuvem";
                 document.getElementById('statusConexao').style.color = "#e67e22";
             }
         }
@@ -352,7 +354,6 @@
 
         function atualizarDashboard(qtdDiferentes) {
             const faltam = TOTAL_DE_HINOS - qtdDiferentes;
-            
             document.getElementById('dashChamados').innerText = qtdDiferentes;
             document.getElementById('dashFaltam').innerText = faltam;
             document.getElementById('dashTotal').innerText = TOTAL_DE_HINOS;
@@ -363,8 +364,9 @@
             const colunaStatus = document.getElementById('colunaStatus');
             tbody.innerHTML = '';
 
+            // Filtra estritamente chaves numéricas válidas para prevenir erros visuais
             const hinosRegistrados = Object.entries(controleHinos)
-                .filter(([hino, qtd]) => hino !== "null" && qtd !== null)
+                .filter(([hino, qtd]) => !isNaN(hino) && hino !== "null" && qtd !== null && typeof qtd === 'number')
                 .map(([hino, qtd]) => [parseInt(hino), qtd]);
 
             atualizarDashboard(hinosRegistrados.length);
@@ -391,8 +393,10 @@
 
             } else if (abaAtual === 'nunca') {
                 colunaStatus.innerText = "Status";
+                // Filtra quais números do total geral não constam no histórico de chaves numéricas
+                const chavesAtivas = hinosRegistrados.map(([hino]) => hino);
                 for (let i = 1; i <= TOTAL_DE_HINOS; i++) {
-                    if (!controleHinos[i]) {
+                    if (!chavesAtActive(chavesAtivas, i)) {
                         hinosExibir.push([i, 0]);
                     }
                 }
@@ -402,6 +406,10 @@
                 }
                 gerarLinesTabela(hinosExibir, 'nunca');
             }
+        }
+
+        function chavesAtActive(arr, val) {
+            return arr.indexOf(val) !== -1;
         }
 
         function gerarLinesTabela(listaHinos, tipo) {
@@ -435,6 +443,7 @@
                     await fetch(FIREBASE_URL, { method: 'DELETE' });
                     localStorage.removeItem('controleHinos_backup');
                     document.getElementById('statusConexao').innerText = "Banco de dados zerado!";
+                    document.getElementById('statusConexao').style.color = "#2ecc71";
                 } catch (e) {
                     alert("Erro ao zerar dados na nuvem.");
                 }
