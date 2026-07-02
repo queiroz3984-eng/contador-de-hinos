@@ -1,18 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <link rel="icon" type="image/png" href="favicon-32x32.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="HandheldFriendly" content="true">
     <title>Contador e Relatório de Hinos (Firebase)</title>
     <style>
-        /* Força todos os elementos a respeitarem o tamanho da tela do celular */
         html, body {
             width: 100%;
             max-width: 100%;
-            min-height: 100vh;
-            overflow-x: hidden; /* Bloqueia qualquer rolagem para os lados */
+            overflow-x: hidden;
             background-color: #f4f7f6;
         }
 
@@ -26,45 +23,54 @@
 
         body {
             color: #333;
-            padding: 12px; /* Pequeno espaçamento nas bordas do celular */
+            padding: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Alinha o conteúdo ao topo de forma fluida */
+            min-height: 100vh;
         }
 
-        /* O container agora se adapta de 0px até 500px, ocupando 100% nos celulares */
         .container {
             width: 100%;
             max-width: 500px;
             background: white;
-            padding: 20px 15px;
+            padding: 15px;
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
-            margin: 10px auto; /* Centraliza horizontalmente e dá espaçamento vertical */
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .logo-app {
+            max-width: 120px;
+            height: auto;
+            object-fit: contain;
         }
 
         h1 {
             text-align: center;
-            font-size: 24px;
+            font-size: 22px;
             color: #2c3e50;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
 
         .status-conexao {
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             color: #7f8c8d;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
-        /* DASHBOARD TOTALMENTE FLEXÍVEL */
         .dashboard {
             display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
+            gap: 6px;
+            margin-bottom: 15px;
             width: 100%;
         }
 
@@ -73,20 +79,20 @@
             background-color: #f8f9fa;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            padding: 12px 4px;
+            padding: 10px 2px;
             text-align: center;
         }
 
         .dash-card h3 {
-            font-size: 10px;
+            font-size: 9px;
             color: #7f8c8d;
             text-transform: uppercase;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
             letter-spacing: 0.2px;
         }
 
         .dash-card p {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             color: #2c3e50;
         }
@@ -94,56 +100,82 @@
         .form-group {
             display: flex;
             gap: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             width: 100%;
         }
 
         input[type="number"] {
             flex: 1;
-            padding: 14px;
-            font-size: 16px; /* O tamanho 16px impede o zoom automático do iPhone */
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
             border: 2px solid #bdc3c7;
             border-radius: 8px;
             outline: none;
-            -moz-appearance: textfield;
-        }
-        
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+            text-align: center;
+            background-color: #f8f9fa;
         }
 
-        input[type="number"]:focus {
-            border-color: #3498db;
+        /* --- ESTILOS DO TECLADO VIRTUAL --- */
+        .teclado-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+            width: 100%;
         }
 
-        button {
-            padding: 14px 20px;
-            font-size: 16px;
-            background-color: #2ecc71;
-            color: white;
-            border: none;
+        .teclado-btn {
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #eaedd0; /* Cor suave para os números */
+            color: #2c3e50;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
-            white-space: nowrap;
+            transition: background 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* ABAS QUE NÃO ENCOLHEM */
+        .teclado-btn:active {
+            background-color: #cbd5e1;
+        }
+
+        .teclado-btn.btn-acao-apagar {
+            background-color: #fca5a5; /* Vermelho claro */
+            color: #991b1b;
+        }
+
+        .teclado-btn.btn-acao-apagar:active {
+            background-color: #f87171;
+        }
+
+        .teclado-btn.btn-acao-confirmar {
+            background-color: #86efac; /* Verde claro */
+            color: #166534;
+        }
+
+        .teclado-btn.btn-acao-confirmar:active {
+            background-color: #4ade80;
+        }
+        /* ---------------------------------- */
+
         .tabs {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             margin-bottom: 15px;
             border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 8px;
+            padding-bottom: 5px;
             width: 100%;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 12px 4px;
-            font-size: 12px;
+            padding: 10px 2px;
+            font-size: 11px;
             background-color: #e0e0e0;
             color: #555;
             border: none;
@@ -160,7 +192,7 @@
 
         .historico-section {
             margin-top: 5px;
-            max-height: 40vh; /* Mantém a tabela proporcional à altura do celular */
+            max-height: 35vh; /* Ajustado ligeiramente para acomodar o teclado */
             overflow-y: auto;
             border: 1px solid #ecf0f1;
             border-radius: 8px;
@@ -173,7 +205,7 @@
         }
 
         th, td {
-            padding: 12px 10px;
+            padding: 10px 8px;
             text-align: left;
             border-bottom: 1px solid #ecf0f1;
         }
@@ -181,7 +213,7 @@
         th {
             background-color: #f8f9fa;
             color: #7f8c8d;
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
             position: sticky;
             top: 0;
@@ -189,7 +221,7 @@
         }
 
         td {
-            font-size: 15px;
+            font-size: 14px;
         }
 
         .hino-num {
@@ -201,12 +233,12 @@
             display: inline-block;
             background-color: #3498db;
             color: white;
-            padding: 4px 10px;
+            padding: 4px 8px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             text-align: center;
-            min-width: 55px;
+            min-width: 45px;
         }
         
         .qtd-badge.menos { background-color: #e67e22; }
@@ -214,7 +246,14 @@
 
         .btn-limpar {
             background-color: #e74c3c;
-            margin-top: 20px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
             width: 100%;
         }
     </style>
@@ -222,6 +261,11 @@
 <body>
 
     <div class="container">
+        
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo do Aplicativo" class="logo-app">
+        </div>
+
         <h1>Contador de Hinos</h1>
         <div id="statusConexao" class="status-conexao">Carregando dados...</div>
         
@@ -241,8 +285,25 @@
         </div>
 
         <div class="form-group">
-            <input type="number" id="hinoInput" placeholder="Nº do hino..." min="1">
-            <button onclick="registrarHino()">Registrar</button>
+            <input type="number" id="hinoInput" placeholder="Digite o número..." min="1" readonly>
+        </div>
+
+        <div class="teclado-container">
+            <button class="teclado-btn" onclick="tecladoDigitar(1)">1</button>
+            <button class="teclado-btn" onclick="tecladoDigitar(2)">2</button>
+            <button class="teclado-btn" onclick="tecladoDigitar(3)">3</button>
+            
+            <button class="teclado-btn" onclick="tecladoDigitar(4)">4</button>
+            <button class="teclado-btn" onclick="tecladoDigitar(5)">5</button>
+            <button class="teclado-btn" onclick="tecladoDigitar(6)">6</button>
+            
+            <button class="teclado-btn" onclick="tecladoDigitar(7)">7</button>
+            <button class="teclado-btn" onclick="tecladoDigitar(8)">8</button>
+            <button class="teclado-btn" onclick="tecladoDigitar(9)">9</button>
+            
+            <button class="teclado-btn btn-acao-apagar" onclick="tecladoApagar()">Apagar</button>
+            <button class="teclado-btn" onclick="tecladoDigitar(0)">0</button>
+            <button class="teclado-btn btn-acao-confirmar" onclick="registrarHino()">Ok</button>
         </div>
 
         <div class="tabs">
@@ -304,12 +365,26 @@
             }
         }
 
+        // FUNÇÕES DO TECLADO VIRTUAL
+        function tecladoDigitar(num) {
+            const input = document.getElementById('hinoInput');
+            // Evita adicionar vários zeros no início do número
+            if (input.value === "" && num === 0) return;
+            input.value += num;
+        }
+
+        function tecladoApagar() {
+            const input = document.getElementById('hinoInput');
+            input.value = input.value.slice(0, -1);
+        }
+
         async function registrarHino() {
             const input = document.getElementById('hinoInput');
             const numeroHino = parseInt(input.value.trim());
 
             if (isNaN(numeroHino) || numeroHino <= 0 || numeroHino > TOTAL_DE_HINOS) {
                 alert(`Por favor, digite um número de hino válido (entre 1 e ${TOTAL_DE_HINOS}).`);
+                input.value = '';
                 return;
             }
 
@@ -320,7 +395,6 @@
             }
 
             input.value = '';
-            input.focus();
             
             atualizarTabela(); 
             await enviarDadosFirebase();
@@ -442,12 +516,6 @@
                 }
             }
         }
-
-        document.getElementById('hinoInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                registrarHino();
-            }
-        });
     </script>
 </body>
 </html>
