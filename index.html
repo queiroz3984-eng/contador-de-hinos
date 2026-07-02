@@ -4,13 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="HandheldFriendly" content="true">
-    <title>Contador e Relatório de Hinos (Firebase)</title>
+    <title>Contador de Hinos</title>
     <style>
+        /* --- CENTRAL DE CORES (VARIÁVEIS DINÂMICAS) --- */
+        :root {
+            --bg-geral: #f4f7f6;
+            --bg-container: #ffffff;
+            --texto-principal: #333333;
+            --texto-secundario: #7f8c8d;
+            --bg-card: #f8f9fa;
+            --borda-card: #e2e8f0;
+            --texto-destaque: #0284c7;
+            --bg-input: #ffffff;
+            --texto-input: #333333;
+            --borda-input: #bdc3c7;
+            --bg-teclado-btn: #eaedd0;
+            --texto-teclado-btn: #2c3e50;
+            --borda-teclado-btn: #cbd5e1;
+            --bg-tab-desativada: #e0e0e0;
+            --texto-tab-desativada: #555555;
+            --bg-tabela-seccao: #ffffff;
+            --borda-tabela: #ecf0f1;
+            --bg-tabela-topo: #f8f9fa;
+            --badge-menos: #e67e22;
+            --badge-nunca: #95a5a6;
+            --btn-limpar-bg: #e74c3c;
+            --btn-limpar-texto: #ffffff;
+            --btn-limpar-borda: #e74c3c;
+        }
+
+        /* PALETE DO MODO ESCURO */
+        [data-theme="dark"] {
+            --bg-geral: #121824;
+            --bg-container: #1e293b;
+            --texto-principal: #e2e8f0;
+            --texto-secundario: #94a3b8;
+            --bg-card: #0f172a;
+            --borda-card: #334155;
+            --texto-destaque: #38bdf8;
+            --bg-input: #0f172a;
+            --texto-input: #f8fafc;
+            --borda-input: #475569;
+            --bg-teclado-btn: #334155;
+            --texto-teclado-btn: #f1f5f9;
+            --borda-teclado-btn: #475569;
+            --bg-tab-desativada: #334155;
+            --texto-tab-desativada: #94a3b8;
+            --bg-tabela-seccao: #0f172a;
+            --borda-tabela: #334155;
+            --bg-tabela-topo: #1e293b;
+            --badge-menos: #b45309;
+            --badge-nunca: #475569;
+            --btn-limpar-bg: #991b1b;
+            --btn-limpar-texto: #fca5a5;
+            --btn-limpar-borda: #7f1d1d;
+        }
+
         html, body {
             width: 100%;
             max-width: 100%;
             overflow-x: hidden;
-            background-color: #f4f7f6;
+            background-color: var(--bg-geral);
+            transition: background-color 0.3s ease;
         }
 
         * {
@@ -22,7 +77,7 @@
         }
 
         body {
-            color: #333;
+            color: var(--texto-principal);
             padding: 12px;
             display: flex;
             flex-direction: column;
@@ -33,12 +88,36 @@
         .container {
             width: 100%;
             max-width: 500px;
-            background: white;
+            background: var(--bg-container);
             padding: 15px;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
             display: flex;
             flex-direction: column;
+            transition: background-color 0.3s ease;
+        }
+
+        /* BOTÃO TEMA */
+        .theme-toggle-container {
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .theme-toggle-btn {
+            background: transparent;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--borda-card);
         }
 
         .logo-container {
@@ -56,17 +135,18 @@
         h1 {
             text-align: center;
             font-size: 22px;
-            color: #2c3e50;
+            color: var(--texto-principal);
             margin-bottom: 3px;
         }
 
         .status-conexao {
             text-align: center;
             font-size: 11px;
-            color: #7f8c8d;
+            color: var(--texto-secundario);
             margin-bottom: 15px;
         }
 
+        /* DASHBOARD */
         .dashboard {
             display: flex;
             gap: 6px;
@@ -76,8 +156,8 @@
 
         .dash-card {
             flex: 1;
-            background-color: #f8f9fa;
-            border: 1px solid #e2e8f0;
+            background-color: var(--bg-card);
+            border: 1px solid var(--borda-card);
             border-radius: 8px;
             padding: 10px 2px;
             text-align: center;
@@ -85,7 +165,7 @@
 
         .dash-card h3 {
             font-size: 9px;
-            color: #7f8c8d;
+            color: var(--texto-secundario);
             text-transform: uppercase;
             margin-bottom: 3px;
             letter-spacing: 0.2px;
@@ -94,7 +174,7 @@
         .dash-card p {
             font-size: 18px;
             font-weight: bold;
-            color: #2c3e50;
+            color: var(--texto-destaque);
         }
 
         .form-group {
@@ -109,14 +189,15 @@
             padding: 12px;
             font-size: 18px;
             font-weight: bold;
-            border: 2px solid #bdc3c7;
+            border: 2px solid var(--borda-input);
             border-radius: 8px;
             outline: none;
             text-align: center;
-            background-color: #f8f9fa;
+            background-color: var(--bg-input);
+            color: var(--texto-input);
         }
 
-        /* --- ESTILOS DO TECLADO VIRTUAL --- */
+        /* TECLADO VIRTUAL */
         .teclado-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -129,45 +210,48 @@
             padding: 15px;
             font-size: 18px;
             font-weight: bold;
-            background-color: #eaedd0; /* Cor suave para os números */
-            color: #2c3e50;
-            border: 1px solid #cbd5e1;
+            background-color: var(--bg-teclado-btn);
+            color: var(--texto-teclado-btn);
+            border: 1px solid var(--borda-teclado-btn);
             border-radius: 8px;
             cursor: pointer;
-            transition: background 0.1s;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .teclado-btn:active {
-            background-color: #cbd5e1;
+            opacity: 0.7;
         }
 
         .teclado-btn.btn-acao-apagar {
-            background-color: #fca5a5; /* Vermelho claro */
-            color: #991b1b;
+            background-color: #7f1d1d;
+            color: #fca5a5;
+            border-color: #991b1b;
         }
-
-        .teclado-btn.btn-acao-apagar:active {
-            background-color: #f87171;
+        [data-theme="light"] .teclado-btn.btn-acao-apagar {
+            background-color: #fca5a5;
+            color: #991b1b;
+            border-color: #f87171;
         }
 
         .teclado-btn.btn-acao-confirmar {
-            background-color: #86efac; /* Verde claro */
+            background-color: #064e3b;
+            color: #86efac;
+            border-color: #047857;
+        }
+        [data-theme="light"] .teclado-btn.btn-acao-confirmar {
+            background-color: #86efac;
             color: #166534;
+            border-color: #4ade80;
         }
 
-        .teclado-btn.btn-acao-confirmar:active {
-            background-color: #4ade80;
-        }
-        /* ---------------------------------- */
-
+        /* ABAS */
         .tabs {
             display: flex;
             gap: 4px;
             margin-bottom: 15px;
-            border-bottom: 2px solid #ecf0f1;
+            border-bottom: 2px solid var(--borda-tabela);
             padding-bottom: 5px;
             width: 100%;
         }
@@ -176,8 +260,8 @@
             flex: 1;
             padding: 10px 2px;
             font-size: 11px;
-            background-color: #e0e0e0;
-            color: #555;
+            background-color: var(--bg-tab-desativada);
+            color: var(--texto-tab-desativada);
             border: none;
             border-radius: 6px;
             cursor: pointer;
@@ -186,17 +270,18 @@
         }
 
         .tab-btn.active {
-            background-color: #3498db;
-            color: white;
+            background-color: #0284c7;
+            color: #ffffff;
         }
 
         .historico-section {
             margin-top: 5px;
-            max-height: 35vh; /* Ajustado ligeiramente para acomodar o teclado */
+            max-height: 35vh;
             overflow-y: auto;
-            border: 1px solid #ecf0f1;
+            border: 1px solid var(--borda-tabela);
             border-radius: 8px;
             width: 100%;
+            background-color: var(--bg-tabela-seccao);
         }
 
         table {
@@ -207,12 +292,12 @@
         th, td {
             padding: 10px 8px;
             text-align: left;
-            border-bottom: 1px solid #ecf0f1;
+            border-bottom: 1px solid var(--borda-tabela);
         }
 
         th {
-            background-color: #f8f9fa;
-            color: #7f8c8d;
+            background-color: var(--bg-tabela-topo);
+            color: var(--texto-secundario);
             font-size: 11px;
             text-transform: uppercase;
             position: sticky;
@@ -222,16 +307,17 @@
 
         td {
             font-size: 14px;
+            color: var(--texto-principal);
         }
 
         .hino-num {
             font-weight: bold;
-            color: #2c3e50;
+            color: var(--texto-principal);
         }
 
         .qtd-badge {
             display: inline-block;
-            background-color: #3498db;
+            background-color: #0284c7;
             color: white;
             padding: 4px 8px;
             border-radius: 20px;
@@ -241,13 +327,13 @@
             min-width: 45px;
         }
         
-        .qtd-badge.menos { background-color: #e67e22; }
-        .qtd-badge.nunca { background-color: #95a5a6; }
+        .qtd-badge.menos { background-color: var(--badge-menos); }
+        .qtd-badge.nunca { background-color: var(--badge-nunca); }
 
         .btn-limpar {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
+            background-color: var(--btn-limpar-bg);
+            color: var(--btn-limpar-texto);
+            border: 1px solid var(--btn-limpar-borda);
             border-radius: 8px;
             padding: 12px;
             font-size: 15px;
@@ -262,6 +348,12 @@
 
     <div class="container">
         
+        <div class="theme-toggle-container">
+            <button class="theme-toggle-btn" id="themeToggleBtn" onclick="alternarTema()">
+                🌙
+            </button>
+        </div>
+
         <div class="logo-container">
             <img src="logo.png" alt="Logo do Aplicativo" class="logo-app">
         </div>
@@ -321,7 +413,7 @@
                     </tr>
                 </thead>
                 <tbody id="tabelaHinos">
-                    <tr><td colspan="2" style="text-align:center; color:#95a5a6;">Nenhum hino registrado ainda.</td></tr>
+                    <tr><td colspan="2" style="text-align:center; color:var(--texto-secundario);">Nenhum hino registrado ainda.</td></tr>
                 </tbody>
             </table>
         </div>
@@ -331,6 +423,7 @@
 
     <script>
         // ================= CONFIGURAÇÃO DO FIREBASE =================
+        // Altere este link para o link correto da sua Realtime Database se necessário
         const FIREBASE_URL = "https://contador-de-hinos-default-rtdb.firebaseio.com/hinos.json"; 
         const TOTAL_DE_HINOS = 480; 
         // ============================================================
@@ -338,6 +431,26 @@
         let controleHinos = {};
         let abaAtual = 'mais';
 
+        // --- SISTEMA DE TEMA (CLARO / ESCURO) ---
+        const temaSalvo = localStorage.getItem('tema_app') || 'dark';
+        document.documentElement.setAttribute('data-theme', temaSalvo);
+        atualizarIconeBotaoTema(temaSalvo);
+
+        function alternarTema() {
+            const temaAtual = document.documentElement.getAttribute('data-theme');
+            const novoTema = temaAtual === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', novoTema);
+            localStorage.setItem('tema_app', novoTema);
+            atualizarIconeBotaoTema(novoTema);
+        }
+
+        function atualizarIconeBotaoTema(tema) {
+            const btn = document.getElementById('themeToggleBtn');
+            btn.innerText = tema === 'dark' ? '☀️' : '🌙';
+        }
+
+        // --- FETCH DE DADOS (FIREBASE + BACKUP SEGURO) ---
         baixarDadosFirebase();
 
         async function baixarDadosFirebase() {
@@ -347,28 +460,31 @@
                 const dados = await response.json();
                 
                 if (dados && (dados.error || dados.rules || typeof dados === 'string')) {
-                    throw new Error("Erro do Firebase.");
+                    throw new Error("Erro de permissões.");
                 }
                 
                 controleHinos = (dados && typeof dados === 'object') ? dados : {};
-                
                 statusDiv.innerText = "Sincronizado com a Nuvem";
-                statusDiv.style.color = "#2ecc71";
+                statusDiv.style.color = "#4ade80"; 
                 atualizarTabela();
             } catch (error) {
-                console.error("Erro ao buscar dados:", error);
-                statusDiv.innerText = "Aviso: Verifique as Regras do Firebase.";
-                statusDiv.style.color = "#e74c3c";
+                console.error("Erro ao procurar dados:", error);
+                statusDiv.innerText = "Modo Offline (Usando Backup)";
+                statusDiv.style.color = "#f87171";
                 
-                controleHinos = JSON.parse(localStorage.getItem('controleHinos_backup')) || {};
+                // Se o Firebase falhar ou o telemóvel bloquear, tenta carregar o backup local com segurança
+                try {
+                    controleHinos = JSON.parse(localStorage.getItem('controleHinos_backup')) || {};
+                } catch(e) {
+                    controleHinos = {};
+                }
                 atualizarTabela();
             }
         }
 
-        // FUNÇÕES DO TECLADO VIRTUAL
+        // TECLADO VIRTUAL
         function tecladoDigitar(num) {
             const input = document.getElementById('hinoInput');
-            // Evita adicionar vários zeros no início do número
             if (input.value === "" && num === 0) return;
             input.value += num;
         }
@@ -383,7 +499,7 @@
             const numeroHino = parseInt(input.value.trim());
 
             if (isNaN(numeroHino) || numeroHino <= 0 || numeroHino > TOTAL_DE_HINOS) {
-                alert(`Por favor, digite um número de hino válido (entre 1 e ${TOTAL_DE_HINOS}).`);
+                alert(`Por favor, introduza um hino válido (1 a ${TOTAL_DE_HINOS}).`);
                 input.value = '';
                 return;
             }
@@ -395,13 +511,13 @@
             }
 
             input.value = '';
-            
             atualizarTabela(); 
             await enviarDadosFirebase();
         }
 
         async function enviarDadosFirebase() {
             try {
+                // Guarda sempre um backup de segurança caso o navegador do telemóvel limpe a memória
                 localStorage.setItem('controleHinos_backup', JSON.stringify(controleHinos));
                 
                 await fetch(FIREBASE_URL, {
@@ -410,11 +526,11 @@
                     headers: { 'Content-Type': 'application/json' }
                 });
                 document.getElementById('statusConexao').innerText = "Alterações salvas na nuvem!";
-                document.getElementById('statusConexao').style.color = "#2ecc71";
+                document.getElementById('statusConexao').style.color = "#4ade80";
             } catch (error) {
-                console.error("Erro ao salvar dados:", error);
-                document.getElementById('statusConexao').innerText = "Erro ao salvar na nuvem";
-                document.getElementById('statusConexao').style.color = "#e67e22";
+                console.error("Erro ao guardar dados:", error);
+                document.getElementById('statusConexao').innerText = "Erro ao sincronizar na nuvem";
+                document.getElementById('statusConexao').style.color = "#fb923c";
             }
         }
 
@@ -449,7 +565,7 @@
                 colunaStatus.innerText = "Vezes Chamado";
                 hinosExibir = [...hinosRegistrados].sort((a, b) => b[1] - a[1]);
                 if (hinosExibir.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#95a5a6;">Nenhum hino registrado ainda.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:var(--texto-secundario);">Nenhum hino registrado ainda.</td></tr>`;
                     return;
                 }
                 gerarLinesTabela(hinosExibir, 'mais');
@@ -458,7 +574,7 @@
                 colunaStatus.innerText = "Vezes Chamado";
                 hinosExibir = [...hinosRegistrados].sort((a, b) => a[1] - b[1]);
                 if (hinosExibir.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#95a5a6;">Nenhum hino registrado ainda.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:var(--texto-secundario);">Nenhum hino registrado ainda.</td></tr>`;
                     return;
                 }
                 gerarLinesTabela(hinosExibir, 'menos');
@@ -472,7 +588,7 @@
                     }
                 }
                 if (hinosExibir.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#2ecc71; font-weight:bold;">Todos os hinos já foram chamados!</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#4ade80; font-weight:bold;">Todos os hinos já foram chamados!</td></tr>`;
                     return;
                 }
                 gerarLinesTabela(hinosExibir, 'nunca');
@@ -510,7 +626,7 @@
                     await fetch(FIREBASE_URL, { method: 'DELETE' });
                     localStorage.removeItem('controleHinos_backup');
                     document.getElementById('statusConexao').innerText = "Banco de dados zerado!";
-                    document.getElementById('statusConexao').style.color = "#2ecc71";
+                    document.getElementById('statusConexao').style.color = "#4ade80";
                 } catch (e) {
                     alert("Erro ao zerar dados na nuvem.");
                 }
