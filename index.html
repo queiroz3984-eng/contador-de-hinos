@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Contador e Relatório de Hinos (Firebase)</title>
     <style>
         * {
@@ -10,81 +10,86 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent; /* Remove o quadrado azul ao tocar no celular */
         }
 
         body {
             background-color: #f4f7f6;
             color: #333;
-            padding: 20px;
+            padding: 10px; /* Reduzido para dar mais espaço nas laterais do celular */
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
 
         .container {
             width: 100%;
             max-width: 500px;
             background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 15px; /* Reduzido para telas menores */
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
         }
 
         h1 {
             text-align: center;
-            font-size: 24px;
+            font-size: 22px;
             color: #2c3e50;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
 
         .status-conexao {
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             color: #7f8c8d;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
-        /* --- ESTILOS DO DASHBOARD --- */
+        /* --- DASHBOARD ADAPTÁVEL --- */
         .dashboard {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 15px;
+            width: 100%;
         }
 
         .dash-card {
             flex: 1;
             background-color: #f8f9fa;
             border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 8px;
+            padding: 10px 5px;
             text-align: center;
         }
 
         .dash-card h3 {
-            font-size: 11px;
+            font-size: 10px;
             color: #7f8c8d;
             text-transform: uppercase;
-            margin-bottom: 5px;
-            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+            letter-spacing: 0.3px;
         }
 
         .dash-card p {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             color: #2c3e50;
         }
-        /* ---------------------------- */
 
         .form-group {
             display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
+            gap: 8px;
+            margin-bottom: 20px;
+            width: 100%;
         }
 
         input[type="number"] {
             flex: 1;
             padding: 12px;
-            font-size: 16px;
+            font-size: 16px; /* 16px impede que o iOS (iPhone) dê zoom automático ao focar */
             border: 2px solid #bdc3c7;
             border-radius: 8px;
             outline: none;
@@ -102,8 +107,8 @@
         }
 
         button {
-            padding: 12px 20px;
-            font-size: 16px;
+            padding: 12px 16px;
+            font-size: 15px;
             background-color: #2ecc71;
             color: white;
             border: none;
@@ -111,30 +116,35 @@
             cursor: pointer;
             font-weight: bold;
             transition: background 0.2s;
+            white-space: nowrap;
         }
 
         button:hover {
             background-color: #27ae60;
         }
 
+        /* --- ABAS AJUSTADAS PARA CELULAR --- */
         .tabs {
             display: flex;
-            gap: 5px;
+            gap: 4px;
             margin-bottom: 15px;
             border-bottom: 2px solid #ecf0f1;
             padding-bottom: 5px;
+            width: 100%;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 8px 5px;
-            font-size: 13px;
+            padding: 10px 2px;
+            font-size: 12px; /* Fonte ligeiramente menor para não quebrar linha em telas pequenas */
             background-color: #e0e0e0;
             color: #555;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s;
+            font-weight: 500;
+            text-align: center;
         }
 
         .tab-btn.active {
@@ -142,10 +152,13 @@
             color: white;
         }
 
+        /* --- ALTURA DINÂMICA DA TABELA --- */
         .historico-section {
-            margin-top: 10px;
-            max-height: 350px;
+            margin-top: 5px;
+            max-height: 50vh; /* Ocupa no máximo 50% da altura da tela do celular */
             overflow-y: auto;
+            border: 1px solid #ecf0f1;
+            border-radius: 8px;
         }
 
         table {
@@ -154,7 +167,7 @@
         }
 
         th, td {
-            padding: 12px;
+            padding: 10px;
             text-align: left;
             border-bottom: 1px solid #ecf0f1;
         }
@@ -162,14 +175,15 @@
         th {
             background-color: #f8f9fa;
             color: #7f8c8d;
-            font-size: 13px;
+            font-size: 12px;
             text-transform: uppercase;
             position: sticky;
             top: 0;
+            z-index: 10;
         }
 
         td {
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .hino-num {
@@ -178,12 +192,15 @@
         }
 
         .qtd-badge {
+            display: inline-block;
             background-color: #3498db;
             color: white;
             padding: 4px 10px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
+            text-align: center;
+            min-width: 50px;
         }
         
         .qtd-badge.menos {
@@ -196,7 +213,7 @@
 
         .btn-limpar {
             background-color: #e74c3c;
-            margin-top: 20px;
+            margin-top: 15px;
             width: 100%;
         }
 
@@ -227,7 +244,7 @@
         </div>
 
         <div class="form-group">
-            <input type="number" id="hinoInput" placeholder="Número do hino..." min="1">
+            <input type="number" id="hinoInput" placeholder="Nº do hino..." min="1">
             <button onclick="registrarHino()">Registrar</button>
         </div>
 
@@ -333,7 +350,6 @@
             atualizarTabela();
         }
 
-        // Nova função interna para atualizar as estatísticas do Dashboard superior
         function atualizarDashboard(qtdDiferentes) {
             const faltam = TOTAL_DE_HINOS - qtdDiferentes;
             
@@ -351,7 +367,6 @@
                 .filter(([hino, qtd]) => hino !== "null" && qtd !== null)
                 .map(([hino, qtd]) => [parseInt(hino), qtd]);
 
-            // Atualiza o painel superior com a quantidade de hinos únicos já cadastrados
             atualizarDashboard(hinosRegistrados.length);
 
             let hinosExibir = [];
