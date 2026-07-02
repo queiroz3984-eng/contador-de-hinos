@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<link rel="icon" type="image/png" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" href="favicon-32x32.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="HandheldFriendly" content="true">
@@ -11,6 +11,7 @@
         html, body {
             width: 100%;
             max-width: 100%;
+            min-height: 100vh;
             overflow-x: hidden; /* Bloqueia qualquer rolagem para os lados */
             background-color: #f4f7f6;
         }
@@ -29,7 +30,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            justify-content: flex-start; /* Alinha o conteúdo ao topo de forma fluida */
         }
 
         /* O container agora se adapta de 0px até 500px, ocupando 100% nos celulares */
@@ -37,32 +38,33 @@
             width: 100%;
             max-width: 500px;
             background: white;
-            padding: 15px;
+            padding: 20px 15px;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
             display: flex;
             flex-direction: column;
+            margin: 10px auto; /* Centraliza horizontalmente e dá espaçamento vertical */
         }
 
         h1 {
             text-align: center;
-            font-size: 22px;
+            font-size: 24px;
             color: #2c3e50;
-            margin-bottom: 3px;
+            margin-bottom: 5px;
         }
 
         .status-conexao {
             text-align: center;
-            font-size: 11px;
+            font-size: 12px;
             color: #7f8c8d;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         /* DASHBOARD TOTALMENTE FLEXÍVEL */
         .dashboard {
             display: flex;
-            gap: 6px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 20px;
             width: 100%;
         }
 
@@ -71,20 +73,20 @@
             background-color: #f8f9fa;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            padding: 10px 2px;
+            padding: 12px 4px;
             text-align: center;
         }
 
         .dash-card h3 {
-            font-size: 9px;
+            font-size: 10px;
             color: #7f8c8d;
             text-transform: uppercase;
-            margin-bottom: 3px;
+            margin-bottom: 5px;
             letter-spacing: 0.2px;
         }
 
         .dash-card p {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             color: #2c3e50;
         }
@@ -98,7 +100,7 @@
 
         input[type="number"] {
             flex: 1;
-            padding: 12px;
+            padding: 14px;
             font-size: 16px; /* O tamanho 16px impede o zoom automático do iPhone */
             border: 2px solid #bdc3c7;
             border-radius: 8px;
@@ -117,8 +119,8 @@
         }
 
         button {
-            padding: 12px 16px;
-            font-size: 15px;
+            padding: 14px 20px;
+            font-size: 16px;
             background-color: #2ecc71;
             color: white;
             border: none;
@@ -131,17 +133,17 @@
         /* ABAS QUE NÃO ENCOLHEM */
         .tabs {
             display: flex;
-            gap: 4px;
+            gap: 6px;
             margin-bottom: 15px;
             border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 5px;
+            padding-bottom: 8px;
             width: 100%;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 10px 2px;
-            font-size: 11px;
+            padding: 12px 4px;
+            font-size: 12px;
             background-color: #e0e0e0;
             color: #555;
             border: none;
@@ -158,7 +160,7 @@
 
         .historico-section {
             margin-top: 5px;
-            max-height: 42vh; /* Ajusta o tamanho da tabela proporcional à tela do celular */
+            max-height: 40vh; /* Mantém a tabela proporcional à altura do celular */
             overflow-y: auto;
             border: 1px solid #ecf0f1;
             border-radius: 8px;
@@ -171,7 +173,7 @@
         }
 
         th, td {
-            padding: 10px 8px;
+            padding: 12px 10px;
             text-align: left;
             border-bottom: 1px solid #ecf0f1;
         }
@@ -179,7 +181,7 @@
         th {
             background-color: #f8f9fa;
             color: #7f8c8d;
-            font-size: 11px;
+            font-size: 12px;
             text-transform: uppercase;
             position: sticky;
             top: 0;
@@ -187,7 +189,7 @@
         }
 
         td {
-            font-size: 14px;
+            font-size: 15px;
         }
 
         .hino-num {
@@ -199,12 +201,12 @@
             display: inline-block;
             background-color: #3498db;
             color: white;
-            padding: 4px 8px;
+            padding: 4px 10px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
             text-align: center;
-            min-width: 45px;
+            min-width: 55px;
         }
         
         .qtd-badge.menos { background-color: #e67e22; }
@@ -212,7 +214,7 @@
 
         .btn-limpar {
             background-color: #e74c3c;
-            margin-top: 15px;
+            margin-top: 20px;
             width: 100%;
         }
     </style>
