@@ -3,8 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="HandheldFriendly" content="true">
     <title>Contador e Relatório de Hinos (Firebase)</title>
     <style>
+        /* Força todos os elementos a respeitarem o tamanho da tela do celular */
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden; /* Bloqueia qualquer rolagem para os lados */
+            background-color: #f4f7f6;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -14,15 +23,15 @@
         }
 
         body {
-            background-color: #f4f7f6;
             color: #333;
-            padding: 10px;
+            padding: 12px; /* Pequeno espaçamento nas bordas do celular */
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
         }
 
+        /* O container agora se adapta de 0px até 500px, ocupando 100% nos celulares */
         .container {
             width: 100%;
             max-width: 500px;
@@ -48,9 +57,10 @@
             margin-bottom: 15px;
         }
 
+        /* DASHBOARD TOTALMENTE FLEXÍVEL */
         .dashboard {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             margin-bottom: 15px;
             width: 100%;
         }
@@ -60,16 +70,16 @@
             background-color: #f8f9fa;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            padding: 10px 5px;
+            padding: 10px 2px;
             text-align: center;
         }
 
         .dash-card h3 {
-            font-size: 10px;
+            font-size: 9px;
             color: #7f8c8d;
             text-transform: uppercase;
             margin-bottom: 3px;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.2px;
         }
 
         .dash-card p {
@@ -88,7 +98,7 @@
         input[type="number"] {
             flex: 1;
             padding: 12px;
-            font-size: 16px;
+            font-size: 16px; /* O tamanho 16px impede o zoom automático do iPhone */
             border: 2px solid #bdc3c7;
             border-radius: 8px;
             outline: none;
@@ -114,14 +124,10 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            transition: background 0.2s;
             white-space: nowrap;
         }
 
-        button:hover {
-            background-color: #27ae60;
-        }
-
+        /* ABAS QUE NÃO ENCOLHEM */
         .tabs {
             display: flex;
             gap: 4px;
@@ -134,14 +140,13 @@
         .tab-btn {
             flex: 1;
             padding: 10px 2px;
-            font-size: 12px;
+            font-size: 11px;
             background-color: #e0e0e0;
             color: #555;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
+            font-weight: bold;
             text-align: center;
         }
 
@@ -152,10 +157,11 @@
 
         .historico-section {
             margin-top: 5px;
-            max-height: 40vh;
+            max-height: 42vh; /* Ajusta o tamanho da tabela proporcional à tela do celular */
             overflow-y: auto;
             border: 1px solid #ecf0f1;
             border-radius: 8px;
+            width: 100%;
         }
 
         table {
@@ -164,7 +170,7 @@
         }
 
         th, td {
-            padding: 10px;
+            padding: 10px 8px;
             text-align: left;
             border-bottom: 1px solid #ecf0f1;
         }
@@ -172,7 +178,7 @@
         th {
             background-color: #f8f9fa;
             color: #7f8c8d;
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
             position: sticky;
             top: 0;
@@ -180,7 +186,7 @@
         }
 
         td {
-            font-size: 15px;
+            font-size: 14px;
         }
 
         .hino-num {
@@ -192,30 +198,21 @@
             display: inline-block;
             background-color: #3498db;
             color: white;
-            padding: 4px 10px;
+            padding: 4px 8px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             text-align: center;
-            min-width: 50px;
+            min-width: 45px;
         }
         
-        .qtd-badge.menos {
-            background-color: #e67e22;
-        }
-
-        .qtd-badge.nunca {
-            background-color: #95a5a6;
-        }
+        .qtd-badge.menos { background-color: #e67e22; }
+        .qtd-badge.nunca { background-color: #95a5a6; }
 
         .btn-limpar {
             background-color: #e74c3c;
             margin-top: 15px;
             width: 100%;
-        }
-
-        .btn-limpar:hover {
-            background-color: #c0392b;
         }
     </style>
 </head>
@@ -285,9 +282,8 @@
                 const response = await fetch(FIREBASE_URL);
                 const dados = await response.json();
                 
-                // Validação crucial: se a resposta conter erro ou "rules", ignora os dados
                 if (dados && (dados.error || dados.rules || typeof dados === 'string')) {
-                    throw new Error("Erro de permissão ou formato inválido retornado pelo Firebase.");
+                    throw new Error("Erro do Firebase.");
                 }
                 
                 controleHinos = (dados && typeof dados === 'object') ? dados : {};
@@ -364,7 +360,6 @@
             const colunaStatus = document.getElementById('colunaStatus');
             tbody.innerHTML = '';
 
-            // Filtra estritamente chaves numéricas válidas para prevenir erros visuais
             const hinosRegistrados = Object.entries(controleHinos)
                 .filter(([hino, qtd]) => !isNaN(hino) && hino !== "null" && qtd !== null && typeof qtd === 'number')
                 .map(([hino, qtd]) => [parseInt(hino), qtd]);
@@ -393,10 +388,9 @@
 
             } else if (abaAtual === 'nunca') {
                 colunaStatus.innerText = "Status";
-                // Filtra quais números do total geral não constam no histórico de chaves numéricas
                 const chavesAtivas = hinosRegistrados.map(([hino]) => hino);
                 for (let i = 1; i <= TOTAL_DE_HINOS; i++) {
-                    if (!chavesAtActive(chavesAtivas, i)) {
+                    if (chavesAtivas.indexOf(i) === -1) {
                         hinosExibir.push([i, 0]);
                     }
                 }
@@ -406,10 +400,6 @@
                 }
                 gerarLinesTabela(hinosExibir, 'nunca');
             }
-        }
-
-        function chavesAtActive(arr, val) {
-            return arr.indexOf(val) !== -1;
         }
 
         function gerarLinesTabela(listaHinos, tipo) {
