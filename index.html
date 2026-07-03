@@ -198,6 +198,32 @@
             color: var(--texto-input);
         }
 
+        .tipo-evento-container {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .tipo-evento-container label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--texto-secundario);
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .tipo-evento-select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border: 2px solid var(--borda-input);
+            border-radius: 8px;
+            background-color: var(--bg-input);
+            color: var(--texto-input);
+            outline: none;
+        }
+
         /* TECLADO VIRTUAL */
         .teclado-container {
             display: grid;
@@ -381,6 +407,14 @@
             <input type="number" id="hinoInput" placeholder="Digite o número..." min="1" readonly>
         </div>
 
+        <div class="tipo-evento-container">
+            <label for="tipoEvento">Tipo de chamada</label>
+            <select id="tipoEvento" class="tipo-evento-select" onchange="atualizarTabela()">
+                <option value="culto">Culto</option>
+                <option value="ensaio">Ensaio</option>
+            </select>
+        </div>
+
         <div class="teclado-container">
             <button class="teclado-btn" onclick="tecladoDigitar(1)">1</button>
             <button class="teclado-btn" onclick="tecladoDigitar(2)">2</button>
@@ -432,6 +466,38 @@
         let controleHinos = {};
         let abaAtual = 'mais';
 
+        function normalizarControleHinos(dados) {
+            const controleVazio = { culto: {}, ensaio: {} };
+
+            if (!dados || typeof dados !== 'object' || Array.isArray(dados)) {
+                return controleVazio;
+            }
+
+            if (dados.culto || dados.ensaio) {
+                return {
+                    culto: (dados.culto && typeof dados.culto === 'object') ? dados.culto : {},
+                    ensaio: (dados.ensaio && typeof dados.ensaio === 'object') ? dados.ensaio : {}
+                };
+            }
+
+            return {
+                culto: dados,
+                ensaio: {}
+            };
+        }
+
+        function obterTipoEventoAtual() {
+            return document.getElementById('tipoEvento').value;
+        }
+
+        function obterControleAtual() {
+            const tipoEvento = obterTipoEventoAtual();
+            if (!controleHinos[tipoEvento] || typeof controleHinos[tipoEvento] !== 'object') {
+                controleHinos[tipoEvento] = {};
+            }
+            return controleHinos[tipoEvento];
+        }
+
         // --- SISTEMA DE TEMA (CLARO / ESCURO) ---
         const temaSalvo = localStorage.getItem('tema_app') || 'dark';
         document.documentElement.setAttribute('data-theme', temaSalvo);
@@ -464,7 +530,7 @@
                     throw new Error("Erro de permissões.");
                 }
                 
-                controleHinos = (dados && typeof dados === 'object') ? dados : {};
+                controleHinos = normalizarControleHinos(dados);
                 statusDiv.innerText = "Sincronizado com a Nuvem";
                 statusDiv.style.color = "#4ade80"; 
                 atualizarTabela();
@@ -475,9 +541,9 @@
                 
                 // Se o Firebase falhar ou o telemóvel bloquear, tenta carregar o backup local com segurança
                 try {
-                    controleHinos = JSON.parse(localStorage.getItem('controleHinos_backup')) || {};
+                    controleHinos = normalizarControleHinos(JSON.parse(localStorage.getItem('controleHinos_backup')));
                 } catch(e) {
-                    controleHinos = {};
+                    controleHinos = normalizarControleHinos({});
                 }
                 atualizarTabela();
             }
@@ -505,10 +571,12 @@
                 return;
             }
 
-            if (controleHinos[numeroHino]) {
-                controleHinos[numeroHino] += 1;
+            const controleAtual = obterControleAtual();
+
+            if (controleAtual[numeroHino]) {
+                controleAtual[numeroHino] += 1;
             } else {
-                controleHinos[numeroHino] = 1;
+                controleAtual[numeroHino] = 1;
             }
 
             input.value = '';
@@ -554,7 +622,8 @@
             const colunaStatus = document.getElementById('colunaStatus');
             tbody.innerHTML = '';
 
-            const hinosRegistrados = Object.entries(controleHinos)
+            const controleAtual = obterControleAtual();
+            const hinosRegistrados = Object.entries(controleAtual)
                 .filter(([hino, qtd]) => !isNaN(hino) && hino !== "null" && qtd !== null && typeof qtd === 'number')
                 .map(([hino, qtd]) => [parseInt(hino), qtd]);
 
@@ -619,8 +688,8 @@
         }
 
         async function limparDados() {
-            if (confirm('Tem certeza que deseja apagar todo o histórico de contagem na NUVEM?')) {
-                controleHinos = {};
+            if (confirm('Tem certeza que deseja apagar todo o histórico de contagem de Culto e Ensaio na NUVEM?')) {
+                controleHinos = normalizarControleHinos({});
                 atualizarTabela();
                 
                 try {
