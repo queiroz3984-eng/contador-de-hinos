@@ -7,7 +7,7 @@
     <meta name="HandheldFriendly" content="true">
     <title>Contador de Hinos</title>
     <style>
-        /* --- CENTRAL DE CORES (VARIÁVEIS DINÂMICAS) --- */
+        /* --- CENTRAL DE CORES (VARIÃVEIS DINÃ‚MICAS) --- */
         :root {
             --bg-geral: #f4f7f6;
             --bg-container: #ffffff;
@@ -98,7 +98,7 @@
             transition: background-color 0.3s ease;
         }
 
-        /* BOTÃO TEMA */
+        /* BOTÃƒO TEMA */
         .theme-toggle-container {
             display: flex;
             justify-content: flex-end;
@@ -369,6 +369,28 @@
             margin-top: 15px;
             width: 100%;
         }
+        
+        .coluna-excluir {
+            width: 44px;
+            text-align: center;
+        }
+
+        .btn-excluir-hino {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid var(--btn-limpar-borda);
+            background-color: var(--btn-limpar-bg);
+            color: var(--btn-limpar-texto);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .btn-excluir-hino:active {
+            opacity: 0.75;
+        }
     </style>
 </head>
 <body>
@@ -377,7 +399,7 @@
         
         <div class="theme-toggle-container">
             <button class="theme-toggle-btn" id="themeToggleBtn" onclick="alternarTema()">
-                🌙
+                ðŸŒ™
             </button>
         </div>
 
@@ -390,7 +412,7 @@
         
         <div class="dashboard">
             <div class="dash-card">
-                <h3>Já Chamados</h3>
+                <h3>JÃ¡ Chamados</h3>
                 <p id="dashChamados">0</p>
             </div>
             <div class="dash-card">
@@ -404,7 +426,7 @@
         </div>
 
         <div class="form-group">
-            <input type="number" id="hinoInput" placeholder="Digite o número..." min="1" readonly>
+            <input type="number" id="hinoInput" placeholder="Digite o nÃºmero..." min="1" readonly>
         </div>
 
         <div class="tipo-evento-container">
@@ -445,10 +467,11 @@
                     <tr>
                         <th>Hino</th>
                         <th id="colunaStatus">Status / Qtd</th>
+                        <th id="colunaAcao" class="coluna-excluir">Excluir</th>
                     </tr>
                 </thead>
                 <tbody id="tabelaHinos">
-                    <tr><td colspan="2" style="text-align:center; color:var(--texto-secundario);">Nenhum hino registrado ainda.</td></tr>
+                    <tr><td colspan="3" style="text-align:center; color:var(--texto-secundario);">Nenhum hino registrado ainda.</td></tr>
                 </tbody>
             </table>
         </div>
@@ -457,8 +480,8 @@
     </div>
 
     <script>
-        // ================= CONFIGURAÇÃO DO FIREBASE =================
-        // Altere este link para o link correto da sua Realtime Database se necessário
+        // ================= CONFIGURAÃ‡ÃƒO DO FIREBASE =================
+        // Altere este link para o link correto da sua Realtime Database se necessÃ¡rio
         const FIREBASE_URL = "https://contador-de-hinos-default-rtdb.firebaseio.com/hinos.json"; 
         const TOTAL_DE_HINOS = 480; 
         // ============================================================
@@ -514,7 +537,7 @@
 
         function atualizarIconeBotaoTema(tema) {
             const btn = document.getElementById('themeToggleBtn');
-            btn.innerText = tema === 'dark' ? '☀️' : '🌙';
+            btn.innerText = tema === 'dark' ? 'â˜€ï¸' : 'ðŸŒ™';
         }
 
         // --- FETCH DE DADOS (FIREBASE + BACKUP SEGURO) ---
@@ -527,7 +550,7 @@
                 const dados = await response.json();
                 
                 if (dados && (dados.error || dados.rules || typeof dados === 'string')) {
-                    throw new Error("Erro de permissões.");
+                    throw new Error("Erro de permissÃµes.");
                 }
                 
                 controleHinos = normalizarControleHinos(dados);
@@ -539,7 +562,7 @@
                 statusDiv.innerText = "Modo Offline (Usando Backup)";
                 statusDiv.style.color = "#f87171";
                 
-                // Se o Firebase falhar ou o telemóvel bloquear, tenta carregar o backup local com segurança
+                // Se o Firebase falhar ou o telemÃ³vel bloquear, tenta carregar o backup local com seguranÃ§a
                 try {
                     controleHinos = normalizarControleHinos(JSON.parse(localStorage.getItem('controleHinos_backup')));
                 } catch(e) {
@@ -566,7 +589,7 @@
             const numeroHino = parseInt(input.value.trim());
 
             if (isNaN(numeroHino) || numeroHino <= 0 || numeroHino > TOTAL_DE_HINOS) {
-                alert(`Por favor, introduza um hino válido (1 a ${TOTAL_DE_HINOS}).`);
+                alert(`Por favor, introduza um hino vÃ¡lido (1 a ${TOTAL_DE_HINOS}).`);
                 input.value = '';
                 return;
             }
@@ -584,9 +607,31 @@
             await enviarDadosFirebase();
         }
 
+
+        async function excluirHino(hino) {
+            const controleAtual = obterControleAtual();
+            const quantidadeAtual = controleAtual[hino] || 0;
+
+            if (quantidadeAtual <= 0) return;
+
+            const mensagem = quantidadeAtual > 1
+                ? `Deseja remover uma chamada do Hino ${hino}? Ele passará de ${quantidadeAtual} para ${quantidadeAtual - 1}.`
+                : `Deseja excluir o Hino ${hino} da contagem?`;
+
+            if (!confirm(mensagem)) return;
+
+            if (quantidadeAtual > 1) {
+                controleAtual[hino] = quantidadeAtual - 1;
+            } else {
+                delete controleAtual[hino];
+            }
+
+            atualizarTabela();
+            await enviarDadosFirebase();
+        }
         async function enviarDadosFirebase() {
             try {
-                // Guarda sempre um backup de segurança caso o navegador do telemóvel limpe a memória
+                // Guarda sempre um backup de seguranÃ§a caso o navegador do telemÃ³vel limpe a memÃ³ria
                 localStorage.setItem('controleHinos_backup', JSON.stringify(controleHinos));
                 
                 await fetch(FIREBASE_URL, {
@@ -594,7 +639,7 @@
                     body: JSON.stringify(controleHinos),
                     headers: { 'Content-Type': 'application/json' }
                 });
-                document.getElementById('statusConexao').innerText = "Alterações salvas na nuvem!";
+                document.getElementById('statusConexao').innerText = "AlteraÃ§Ãµes salvas na nuvem!";
                 document.getElementById('statusConexao').style.color = "#4ade80";
             } catch (error) {
                 console.error("Erro ao guardar dados:", error);
@@ -620,6 +665,7 @@
         function atualizarTabela() {
             const tbody = document.getElementById('tabelaHinos');
             const colunaStatus = document.getElementById('colunaStatus');
+            const colunaAcao = document.getElementById('colunaAcao');
             tbody.innerHTML = '';
 
             const controleAtual = obterControleAtual();
@@ -633,24 +679,27 @@
 
             if (abaAtual === 'mais') {
                 colunaStatus.innerText = "Vezes Chamado";
+                colunaAcao.style.display = "";
                 hinosExibir = [...hinosRegistrados].sort((a, b) => b[1] - a[1]);
                 if (hinosExibir.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:var(--texto-secundario);">Nenhum hino registrado ainda.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--texto-secundario);">Nenhum hino registrado ainda.</td></tr>`;
                     return;
                 }
                 gerarLinesTabela(hinosExibir, 'mais');
 
             } else if (abaAtual === 'menos') {
                 colunaStatus.innerText = "Vezes Chamado";
+                colunaAcao.style.display = "";
                 hinosExibir = [...hinosRegistrados].sort((a, b) => a[1] - b[1]);
                 if (hinosExibir.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:var(--texto-secundario);">Nenhum hino registrado ainda.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--texto-secundario);">Nenhum hino registrado ainda.</td></tr>`;
                     return;
                 }
                 gerarLinesTabela(hinosExibir, 'menos');
 
             } else if (abaAtual === 'nunca') {
                 colunaStatus.innerText = "Status";
+                colunaAcao.style.display = "none";
                 const chavesAtivas = hinosRegistrados.map(([hino]) => hino);
                 for (let i = 1; i <= TOTAL_DE_HINOS; i++) {
                     if (chavesAtivas.indexOf(i) === -1) {
@@ -658,7 +707,7 @@
                     }
                 }
                 if (hinosExibir.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#4ade80; font-weight:bold;">Todos os hinos já foram chamados!</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#4ade80; font-weight:bold;">Todos os hinos jÃ¡ foram chamados!</td></tr>`;
                     return;
                 }
                 gerarLinesTabela(hinosExibir, 'nunca');
@@ -682,13 +731,14 @@
                 tr.innerHTML = `
                     <td class="hino-num">Hino ${hino}</td>
                     <td><span class="${badgeClass}">${textoQuantidade}</span></td>
+                    ${tipo === 'nunca' ? '' : `<td class="coluna-excluir"><button class="btn-excluir-hino" onclick="excluirHino(${hino})" title="Excluir chamada do Hino ${hino}">×</button></td>`}
                 `;
                 tbody.appendChild(tr);
             });
         }
 
         async function limparDados() {
-            if (confirm('Tem certeza que deseja apagar todo o histórico de contagem de Culto e Ensaio na NUVEM?')) {
+            if (confirm('Tem certeza que deseja apagar todo o histÃ³rico de contagem de Culto e Ensaio na NUVEM?')) {
                 controleHinos = normalizarControleHinos({});
                 atualizarTabela();
                 
@@ -705,3 +755,4 @@
     </script>
 </body>
 </html>
+
