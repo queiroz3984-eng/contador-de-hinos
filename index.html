@@ -7,7 +7,7 @@
     <meta name="HandheldFriendly" content="true">
     <title>Contador de Hinos</title>
     <style>
-        /* --- CENTRAL DE CORES (VARIÃVEIS DINÃ‚MICAS) --- */
+        /* --- CENTRAL DE CORES (VARIÁVEIS DINÂMICAS) --- */
         :root {
             --bg-geral: #f4f7f6;
             --bg-container: #ffffff;
@@ -412,7 +412,7 @@
         
         <div class="dashboard">
             <div class="dash-card">
-                <h3>JÃ¡ Chamados</h3>
+                <h3>Já Chamados</h3>
                 <p id="dashChamados">0</p>
             </div>
             <div class="dash-card">
@@ -426,7 +426,7 @@
         </div>
 
         <div class="form-group">
-            <input type="number" id="hinoInput" placeholder="Digite o nÃºmero..." min="1" readonly>
+            <input type="number" id="hinoInput" placeholder="Digite o número..." min="1" readonly>
         </div>
 
         <div class="tipo-evento-container">
@@ -481,7 +481,7 @@
 
     <script>
         // ================= CONFIGURAÃ‡ÃƒO DO FIREBASE =================
-        // Altere este link para o link correto da sua Realtime Database se necessÃ¡rio
+        // Altere este link para o link correto da sua Realtime Database se necessário
         const FIREBASE_URL = "https://contador-de-hinos-default-rtdb.firebaseio.com/hinos.json"; 
         const TOTAL_DE_HINOS = 480; 
         // ============================================================
@@ -537,7 +537,7 @@
 
         function atualizarIconeBotaoTema(tema) {
             const btn = document.getElementById('themeToggleBtn');
-            btn.innerText = tema === 'dark' ? 'â˜€ï¸' : 'ðŸŒ™';
+            btn.innerText = tema === 'dark' ? '☀' : '☾';
         }
 
         // --- FETCH DE DADOS (FIREBASE + BACKUP SEGURO) ---
@@ -707,7 +707,7 @@
                     }
                 }
                 if (hinosExibir.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#4ade80; font-weight:bold;">Todos os hinos jÃ¡ foram chamados!</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#4ade80; font-weight:bold;">Todos os hinos já foram chamados!</td></tr>`;
                     return;
                 }
                 gerarLinesTabela(hinosExibir, 'nunca');
@@ -738,7 +738,7 @@
         }
 
         async function limparDados() {
-            if (confirm('Tem certeza que deseja apagar todo o histÃ³rico de contagem de Culto e Ensaio na NUVEM?')) {
+            if (confirm('Tem certeza que deseja apagar todo o histórico de contagem de Culto e Ensaio na NUVEM?')) {
                 controleHinos = normalizarControleHinos({});
                 atualizarTabela();
                 
